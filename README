@@ -1,4 +1,4 @@
-# Implementation of Neural Network Q Learning for RL
+# Implementation of Double-DeepQ Learning and Deep-Q Learning for RL
 # Add Convolutional Layers if desired (Working on ATARI)
 # Dependancies
  1) TensorFlow
@@ -9,7 +9,7 @@ Although code is for lower dimensional problems, modify the model as desired in 
 Code uses the following tricks given in the deep mind papers for stable convergence
 If using ATARI GamePlay, choose in env.make() function.
 1) Experience Replay with bounded rewards.
-2) Target Network, which is updated once every C steps (Hyperparameter). Without this, many environments cannot be solved. However an implementation has been included for reference.
+2) Target Network, which is updated once every C steps (Hyperparameter)
 3) Double DQN Proposed by Hado Van Hasselt in 2016 is also included.
 
 
