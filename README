@@ -1,8 +1,7 @@
-#Code by Sridhar T
 # Implementation of Neural Network Q Learning for RL
 # Add Convolutional Layers if desired (Working on ATARI)
 # Dependancies
- 1) TensorFlow + Keras
+ 1) TensorFlow
  2) OpenAI Gym
  3) Numpy
 
