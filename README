@@ -1,4 +1,5 @@
 # Implementation of Double-DeepQ Learning and Deep-Q Learning for RL
+For a detailed discussion, visit : https://sridhartee.blogspot.in/2017/02/deep-q-networks-and-double-dqn.html
 # Add Convolutional Layers if desired (Working on ATARI)
 # Dependancies
  1) TensorFlow
