@@ -15,10 +15,10 @@ batch_size=32 #the batch size used for experience replay
 steps=np.zeros(num_epochs)
 batch=np.empty([1,observations_dim])
 emax=1
-emin=0.01
+emin=0.05
 epsilon=1  #epsilon will exponentially decrease from 1 to emin.
 dparam=0.001 #decay parameter
-tnuf=25 #target network update frequency
+tnuf=150#target network update frequency
 num_hidden_1=64
 num_hidden_2=64
 
