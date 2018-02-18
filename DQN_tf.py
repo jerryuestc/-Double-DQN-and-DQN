@@ -10,7 +10,7 @@ num_epochs=1000
 observations_dim=np.shape(env.observation_space.high)[0] #the observations in the environment
 gamma=0.99 #discount factor
 visualize_after_steps=10 #start the display
-memorylen=100000 #memory size
+memorylen=100000 #memory size of experience replay
 batch_size=32 #the batch size used for experience replay
 steps=np.zeros(num_epochs)
 batch=np.empty([1,observations_dim])
@@ -24,7 +24,7 @@ num_hidden_2=64
 
 np.random.seed(1234)
 
-def translate(value, leftMin, leftMax, rightMin, rightMax):
+def translate(value, leftMin, leftMax, rightMin, rightMax): #this scales the state variables appropriately, called by normalize function
    
     leftrange = leftMax - leftMin
     rightrange = rightMax - rightMin
@@ -37,20 +37,20 @@ def normalize(state):
     
     normstate=np.empty(np.shape(state))
     if num_actions==2:
-        val=np.array([2.5, 3.6, 0.28, 3.7]) #in case you want to set manually the limits
+        val=np.array([2.5, 3.6, 0.28, 3.7]) #in case you want to set manually the limits, like in cartpole
         val1=-val
     else:
         val=env.observation_space.low
         val1=env.observation_space.high
     
     for i in range(np.shape(state)[0]):
-        normstate[i]=translate(state[i],val[i],val1[i],0,1)
+        normstate[i]=translate(state[i],val[i],val1[i],0,1) #making into zero one range
     normstate=state
     return normstate
     
 
-x=tf.placeholder('float32',[None,observations_dim])
-y=tf.placeholder('float32',[None,num_actions])
+x=tf.placeholder('float32',[None,observations_dim]) #input state
+y=tf.placeholder('float32',[None,num_actions]) #ground truth q values
 
 
 w1=tf.Variable(tf.random_normal([observations_dim,num_hidden_1]))
@@ -62,9 +62,9 @@ bias2=tf.Variable(tf.random_normal([num_hidden_2]))
 act2=tf.nn.relu(tf.add(tf.matmul(act1,w2),bias2))
 w3=tf.Variable(tf.random_normal([num_hidden_2,num_actions]))
 bias3=tf.Variable(tf.random_normal([num_actions]))
-qval=tf.add(tf.matmul(act2,w3),bias3)
+qval=tf.add(tf.matmul(act2,w3),bias3) #the outpuot q value.
 
-#target network
+#target network, which has similar architecture, but different weights.
 w1_tar=tf.Variable(tf.random_normal([observations_dim,num_hidden_1]))
 bias1_tar=tf.Variable(tf.random_normal([num_hidden_1]))
 act1_tar=tf.nn.relu(tf.add(tf.matmul(x,w1_tar),bias1_tar))
@@ -84,11 +84,11 @@ sess.run(init_op)
 
 def updatetarget():
     sess.run([ w1_tar.assign(w1),w2_tar.assign(w2),bias1_tar.assign(bias1),bias2_tar.assign(bias2),w3_tar.assign(w3),\
-            bias3_tar.assign(bias3)])
+            bias3_tar.assign(bias3)]) #the copies the weight of actor network to the target network, every t steps.
     
 updatetarget()   
     
-def pick_action(curstate):
+def pick_action(curstate): #pick the action epsilon greedily.
     
     
     qvalues =sess.run(qval,feed_dict={x:curstate.reshape(1,observations_dim)})
@@ -98,12 +98,12 @@ def pick_action(curstate):
         action = (np.argmax(qvalues))
     return action
     
-def compute_target(curstate):
+def compute_target(curstate): #qvalue computation by target network.
     qvalues = sess.run(qval_tar,{x:curstate.reshape(-1,observations_dim)})
     return qvalues
     
     
-def updateweights(replay):
+def updateweights(replay): #experience replay steps.
     
     batch_len = min(batch_size,len(replay))
     minibatch=random.sample(replay,batch_len)
@@ -149,7 +149,7 @@ for idx,i in enumerate(range(int(num_epochs))):
         steps[idx]+=1
         #env.render()
         curaction=pick_action(csn)
-        nextstate,reward, done, info = env.step(curaction) #environment
+        nextstate,reward, done, info = env.step(curaction) #environment simulator called
         #print(curstate)
         nsn=normalize(nextstate)
         
@@ -159,7 +159,7 @@ for idx,i in enumerate(range(int(num_epochs))):
         if (len(replay) > memorylen): 
             replay.pop(0) #memory has been filled, start refill
             
-        model=updateweights(replay)
+        model=updateweights(replay) #updating the weights by calling experience replay function.
         
         if done or steps[idx]>2000:
             print('Episode %d ended in %d steps' %(idx,steps[idx]))
@@ -171,7 +171,7 @@ for idx,i in enumerate(range(int(num_epochs))):
         
         if steps[idx]%tnuf==0: #update every 25 steps
             
-            epsilon = emin + (emax - emin)*np.exp(-dparam* np.sum(steps))
+            epsilon = emin + (emax - emin)*np.exp(-dparam* np.sum(steps)) #decaying the exploration parameter epsilon.
             updatetarget()
      
 env.monitor.close()
