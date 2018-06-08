@@ -44,7 +44,6 @@ def normalize(state):
     
     for i in range(np.shape(state)[0]):
         normstate[i]=translate(state[i],val[i],val1[i],0,1)
-    normstate=state
     return normstate
 
 x=tf.placeholder('float32',[None,observations_dim])
