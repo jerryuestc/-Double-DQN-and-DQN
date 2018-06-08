@@ -45,7 +45,6 @@ def normalize(state):
     
     for i in range(np.shape(state)[0]):
         normstate[i]=translate(state[i],val[i],val1[i],0,1) #making into zero one range
-    normstate=state
     return normstate
     
 
